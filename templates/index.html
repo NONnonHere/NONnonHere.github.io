@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {%- set posts = get_section(path="posts/_index.md") %}
+  {%- set shown = posts.pages | slice(end=config.extra.posts_on_homepage) %}
+  <ul class="posts">
+    {%- for post in shown %}
+    <li>
+      <span class="title"><a href="{{ post.permalink | safe }}">{{ post.title }}</a></span>
+      <time datetime="{{ post.date }}">{{ post.date | date(format="%b %-d, %Y") }}</time>
+    </li>
+    {%- endfor %}
+  </ul>
+  {%- if posts.pages | length > config.extra.posts_on_homepage %}
+  <p class="more"><a href="{{ posts.permalink | safe }}">more &raquo;</a></p>
+  {%- endif %}
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% set nav_active = "tags" %}
+
+{% block title %}{{ term.name }} &middot; {{ config.title }}{% endblock title %}
+
+{% block content %}
+<p class="year">{{ term.name }}</p>
+<ul class="posts">
+  {%- for post in term.pages %}
+  <li>
+    <span class="title"><a href="{{ post.permalink | safe }}">{{ post.title }}</a></span>
+    <time datetime="{{ post.date }}">{{ post.date | date(format="%b %-d, %Y") }}</time>
+  </li>
+  {%- endfor %}
+</ul>
+{% endblock content %}

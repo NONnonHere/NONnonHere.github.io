@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% set nav_active = page.extra.nav | default(value="") %}
+
+{% block title %}{{ page.title }} &middot; {{ config.title }}{% endblock title %}
+{% block og_title %}{{ page.title }}{% endblock og_title %}
+
+{% block content %}
+<article>
+  <h1 class="post-title">{{ page.title }}</h1>
+  <div style="margin-top:2rem">{{ page.content | safe }}</div>
+</article>
+{% endblock content %}

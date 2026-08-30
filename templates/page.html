@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% set nav_active = "posts" %}
+
+{% block title %}{{ page.title }} &middot; {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description | default(value=config.description) }}{% endblock description %}
+{% block og_title %}{{ page.title }}{% endblock og_title %}
+{% block og_type %}article{% endblock og_type %}
+
+{% block content %}
+{%- if page.toc | length > 1 %}
+<nav class="toc" aria-label="Table of contents">
+  <p class="toc-title">On this page</p>
+  <ul>
+    {%- for h1 in page.toc %}
+    <li>
+      <a href="#{{ h1.id }}">{{ h1.title }}</a>
+      {%- if h1.children %}
+      <ul>
+        {%- for h2 in h1.children %}
+        <li><a href="#{{ h2.id }}">{{ h2.title }}</a></li>
+        {%- endfor %}
+      </ul>
+      {%- endif %}
+    </li>
+    {%- endfor %}
+  </ul>
+</nav>
+{%- endif %}
+<article>
+  <h1 class="post-title">{{ page.title }}</h1>
+  {%- if page.date %}
+  <p class="meta">
+    <time datetime="{{ page.date }}">{{ page.date | date(format="%b %-d, %Y") }}</time>
+    {%- if page.taxonomies.tags %} &middot;
+      {%- for tag in page.taxonomies.tags %}
+      <a href="{{ get_taxonomy_url(kind='tags', name=tag) | safe }}">{{ tag }}</a>{% if not loop.last %},{% endif %}
+      {%- endfor %}
+    {%- endif %}
+  </p>
+  {%- endif %}
+  {{ page.content | safe }}
+</article>
+{% endblock content %}

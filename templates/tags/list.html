@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% set nav_active = "tags" %}
+
+{% block title %}tags &middot; {{ config.title }}{% endblock title %}
+
+{% block content %}
+<ul class="tag-cloud">
+  {%- for term in terms %}
+  <li><a href="{{ term.permalink | safe }}">{{ term.name }}</a> <span class="count">{{ term.pages | length }}</span></li>
+  {%- endfor %}
+</ul>
+{%- if terms | length == 0 %}
+<p class="tagline">No tags yet.</p>
+{%- endif %}
+{% endblock content %}

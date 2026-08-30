@@ -1,0 +1,25 @@
+base_url = "https://nonnonhere.github.io"
+title = "Tanmay"
+description = "Notes on Rust, systems programming, and whatever I'm building."
+default_language = "en"
+
+compile_sass = false
+build_search_index = false
+generate_feeds = false
+
+taxonomies = [
+  { name = "tags", feed = false },
+]
+
+[markdown]
+highlight_code = true
+highlight_theme = "gruvbox-dark"
+smart_punctuation = false
+
+[extra]
+handle = "@NONnonHere"
+tagline = "Whether you think you can or you think you can't, you're right!"
+github = "https://github.com/NONnonHere"
+linkedin = "https://www.linkedin.com/in/"
+email = "tanmayhere33@gmail.com"
+posts_on_homepage = 5

@@ -1,0 +1,246 @@
+/* nonnonhere.me — dark only, no JS, no webfonts. */
+
+:root {
+  --bg:        #1b1b1b;
+  --fg:        #c9c9c9;
+  --fg-strong: #e6e6e6;
+  --muted:     #6f6f6f;
+  --link:      #8ba3e8;
+  --rule:      #2e2e2e;
+  --code-bg:   #232323;
+  --measure:   46rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0 1.5rem 6rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding-top: clamp(2rem, 6vh, 4.5rem);
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- header ---------- */
+
+.masthead { display: flex; align-items: flex-start; gap: 1.1rem; }
+
+.avatar {
+  width: 72px; height: 72px; flex: none;
+  border-radius: 50%;
+  background: var(--code-bg);
+}
+
+.identity { padding-top: .35rem; }
+
+.identity .line { display: flex; align-items: baseline; gap: 1.1rem; flex-wrap: wrap; }
+
+.name { color: var(--fg-strong); font-size: 1.25rem; font-weight: 500; }
+
+.handle { color: var(--link); font-size: 1.05rem; }
+
+.tagline { color: var(--muted); margin: .15rem 0 0; font-size: .95rem; }
+
+.bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  margin: 2.5rem 0 3rem;
+}
+
+nav.site { display: flex; gap: 1.35rem; }
+
+nav.site a {
+  color: var(--fg-strong);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: #4a4a4a;
+}
+nav.site a:hover,
+nav.site a[aria-current="page"] { text-decoration-color: currentColor; }
+
+.social { display: flex; gap: 1.1rem; align-items: center; }
+.social a { color: var(--muted); display: inline-flex; }
+.social a:hover { color: var(--fg-strong); }
+.social svg { width: 19px; height: 19px; display: block; }
+
+/* ---------- post list ---------- */
+
+.posts { list-style: none; margin: 0; padding: 0; }
+
+.posts li {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1.5rem;
+  padding: .42rem 0;
+}
+
+.posts .title { flex: 1 1 auto; min-width: 0; }
+
+.posts time { color: var(--link); font-variant-numeric: tabular-nums; flex: none; }
+
+.more { text-align: right; margin-top: 2rem; }
+.more a { text-decoration: underline; text-underline-offset: 4px; }
+
+.year {
+  color: var(--muted);
+  font-size: .85rem;
+  letter-spacing: .08em;
+  margin: 2.2rem 0 .4rem;
+}
+.year:first-child { margin-top: 0; }
+
+/* ---------- article ---------- */
+
+article h1.post-title {
+  color: var(--fg-strong);
+  font-size: 1.75rem;
+  line-height: 1.25;
+  font-weight: 600;
+  margin: 0 0 .4rem;
+}
+
+.meta { color: var(--muted); font-size: .9rem; margin-bottom: 2.5rem; }
+.meta a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.meta a:hover { color: var(--fg-strong); }
+
+article h2 {
+  color: var(--fg-strong);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 2.6rem 0 .8rem;
+}
+
+article h3 {
+  color: var(--fg-strong);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 2rem 0 .6rem;
+}
+
+article p, article li { overflow-wrap: break-word; }
+
+article ul, article ol { padding-left: 1.3rem; }
+article li { margin: .3rem 0; }
+article li::marker { color: var(--muted); }
+
+article strong { color: var(--fg-strong); font-weight: 600; }
+
+article hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+article blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--rule);
+  color: var(--muted);
+}
+
+code {
+  background: var(--code-bg);
+  padding: .12em .35em;
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace;
+  font-size: .88em;
+}
+
+pre {
+  background: var(--code-bg);
+  padding: .9rem 1rem;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+
+article table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+article th, article td { border: 1px solid var(--rule); padding: .45rem .7rem; text-align: left; }
+
+/* ---------- tags ---------- */
+
+.tag-cloud { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .8rem 1.4rem; }
+.tag-cloud .count { color: var(--muted); font-size: .85rem; }
+
+/* ---------- footer ---------- */
+
+footer.site {
+  margin-top: 5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: .85rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .posts li { flex-direction: column; gap: .1rem; padding: .55rem 0; }
+  .posts time { font-size: .85rem; }
+}
+
+/* ---------- factsheet (report header block) ---------- */
+
+.factsheet {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .3rem 1.2rem;
+  margin: 0 0 1rem;
+  font-size: .95rem;
+}
+.factsheet dt { color: var(--muted); }
+.factsheet dd { margin: 0; color: var(--fg); }
+
+@media (max-width: 460px) {
+  .factsheet { grid-template-columns: 1fr; gap: 0 0; }
+  .factsheet dt { margin-top: .6rem; }
+}
+
+/* ---------- table of contents (post pages, wide screens) ---------- */
+
+.toc {
+  position: fixed;
+  top: 7rem;
+  left: calc(50% + 23rem + 2rem);
+  width: 12.5rem;
+  max-height: calc(100vh - 10rem);
+  overflow-y: auto;
+  padding-left: 1rem;
+  border-left: 1px solid var(--rule);
+  font-size: .85rem;
+  line-height: 1.45;
+}
+
+.toc-title {
+  margin: 0 0 .7rem;
+  color: var(--muted);
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.toc ul { list-style: none; margin: 0; padding: 0; }
+.toc ul ul { padding-left: .85rem; margin: .25rem 0; }
+.toc li { margin: .35rem 0; }
+
+.toc a { color: var(--muted); }
+.toc a:hover { color: var(--fg-strong); text-decoration: none; }
+
+article h2, article h3 { scroll-margin-top: 1.5rem; }
+
+@media (max-width: 1260px) {
+  .toc { display: none; }
+}
