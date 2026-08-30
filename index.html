@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>It works</title>
+  <style>
+    body { font-family: system-ui, sans-serif; display: grid; place-items: center;
+           min-height: 100vh; margin: 0; background: #111; color: #eee; }
+    p { opacity: .6; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Deployed 🎉</h1>
+    <p id="host"></p>
+  </main>
+  <script>document.getElementById('host').textContent = location.hostname;</script>
+</body>
+</html>
