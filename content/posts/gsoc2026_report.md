@@ -23,31 +23,80 @@ dynamic dispatch on every user. The project replaces that trait-object design wi
 concrete `SerialPort` struct matching how `std` exposes `File` and `TcpStream` and uses
 the resulting major release (5.0) to land safety and ergonomics improvements that were blocked
 on a semver-breaking window. All work targets the `playground-5.0` branch.
- 
+
 ---
  
 ## What I Did
- 
-**Struct unification**
-- [#352](https://github.com/serialport/serialport-rs/pull/352) — Unify `TTYPort` and `COMPort` into a single concrete `SerialPort` struct routed through a `sys` alias.
-- [#344](https://github.com/serialport/serialport-rs/pull/344) — Prevent `HANDLE` leaks in `COMPort::open` using `OwnedHandle`.
 
-**Panic-to-Result safety**
+## Struct unification
 
-- [#322](https://github.com/serialport/serialport-rs/pull/322) — Handle unhandled return values in `TTYPort::open`.
-- [#368](https://github.com/serialport/serialport-rs/pull/368) — Return errors instead of panicking when reading baud rate.
-- [#359](https://github.com/serialport/serialport-rs/pull/359) — Propagate `tcgetattr` errors from `get_termios_speed` instead of panicking when reading baud rate.
-- [#371](https://github.com/serialport/serialport-rs/pull/371) — Fix `TTYPort::into_raw_fd` to transfer the fd safely when unlocking fails.
+**[#352](https://github.com/serialport/serialport-rs/pull/352) — Unify `TTYPort` and `COMPort` into a concrete `SerialPort` struct**
 
-**Feature enablement**
+The library exposed ports through a `SerialPort` trait, so cross-platform code had to hold a `Box<dyn SerialPort>` a heap allocation and dynamic dispatch for what is really just a file descriptor or handle. This PR turns SerialPort into a single concrete struct wrapping the platform type behind a sys alias, and moves platform-specific behaviour into a `SerialPortExt` extension trait. The goal was to make this change without disturbing the common calling pattern: `serialport::new(...).open()` still reads the same, it just no longer needs to box.
 
-- [#365](https://github.com/serialport/serialport-rs/pull/365) — Gate platform-specific `Parity` (Mark/Space) and `StopBits` (1.5) variants behind `#[cfg]` and mark the enums `#[non_exhaustive]`.
-- [#345](https://github.com/serialport/serialport-rs/pull/345) — Configurable `ReadIntervalTimeout` and prevent timeout overflow on Windows.
+**[#344](https://github.com/serialport/serialport-rs/pull/344) — Prevent `HANDLE` leaks in `COMPort::open` using `OwnedHandle`**
+
+Several FFI calls in the Windows open path had their return values ignored, so failures could go unnoticed, and a raw `HANDLE` could leak if `open` returned early during configuration. Rust's `#[must_use]` normally catches this, but FFI bindings rarely have the attribute, so each call had to be checked manually and handled appropriately. Storing the handle as an `OwnedHandle` makes cleanup automatic on any early return.
 
 
-Full list: <https://github.com/serialport/serialport-rs/pulls/NONnonHere>
- 
----
+### Panic-to-Result safety
+
+**[#322](https://github.com/serialport/serialport-rs/pull/322) — Handle unhandled return values in `TTYPort::open`**
+
+The POSIX counterpart to the same problem, return values in the open path that were silently
+dropped. Each was analysed and either handled or propagated, so setup failures surface as errors
+instead of going unnoticed.
+
+**[#368](https://github.com/serialport/serialport-rs/pull/368) — Return errors instead of panicking when reading baud rate**
+
+`baud_rate()` could panic inside a function that already returns `Result` a `assert!` comparing
+input and output speeds across three platform variants, and an `unreachable!()` closing the
+PowerPC baud-rate match that was in fact reachable for any port set to a non-listed rate. Both now
+propagate as errors rather than terminating the caller's process.
+
+**[#359](https://github.com/serialport/serialport-rs/pull/359) — Propagate `tcgetattr` errors from `get_termios_speed`**
+
+`get_termios_speed` used `.expect()` on a syscall that can fail if the descriptor is invalid or the
+device disconnects. What looked like a small panic fix opened a design question on Apple targets
+whether to cache the last-set baud rate at all, or read it back live from `termios` including
+whether a non-standard rate set via `IOSSIOSPEED` reads back faithfully. Still in review.
+
+**[#371](https://github.com/serialport/serialport-rs/pull/371) — Don't panic in `into_raw_fd` when unlocking fails**
+
+`into_raw_fd` could panic if releasing the advisory lock failed. It now handles that gracefully
+while still transferring the descriptor without the destructor closing it.
+
+### Feature enablement
+
+**[#365](https://github.com/serialport/serialport-rs/pull/365) — Platform-specific `Parity` and `StopBits` variants, gated at compile time**
+
+Adds `Parity::Mark`/`Space` and `StopBits::OnePointFive`, but only on the platforms that actually
+support them: gated behind `#[cfg]`, with the enums marked `#[non_exhaustive]` so unsupported
+variants cannot be constructed where they would fail at runtime. Choosing between compiletime
+gating and runtime errors is where most of the time on this went, and it needed evidence rather
+than opinion see below.
+
+**[#345](https://github.com/serialport/serialport-rs/pull/345) — Configurable `ReadIntervalTimeout` and prevent timeout overflow**
+
+A Windows fix following a correctness problem I raised while reviewing #320: changing
+`ReadIntervalTimeout` without also clearing `ReadTotalTimeoutMultiplier` overflows the total
+timeout and breaks the read semantics established in #79.
+
+### Ecosystem analysis
+
+**Downstream usage surveys for the `#[non_exhaustive]` decision**
+
+Marking `Parity` and `StopBits` as `#[non_exhaustive]` is a breaking change for anyone matching on
+them exhaustively, so the decision needed data. I surveyed the direct dependents of `serialport`,
+then repeated the exercise across the 152 dependents of `tokio-serial`. Setting dominates matching
+in both populations 24 setters against 12 apparent parity matchers, and 25 against 7 for
+`StopBits`, with only 2 crates reading anything back. Most of the apparent matchers turned out to
+be false positives: 13 crates define their own `Parity` enum and match on that to convert into
+ours. After checking imports and `From` direction, only 2 crates genuinely match our types. That
+result is what settled the design and unblocked the merge.
+
+**Full list of PRs:** <https://github.com/serialport/serialport-rs/pulls?q=is%3Apr+author%3ANONnonHere+>
+
  
 ## Current State
  
